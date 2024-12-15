@@ -35,6 +35,18 @@ def main():
                 print(delete_contact(args, book))
             else:
                 print("Usage: delete <name>") 
+        elif command == "add-birthday":
+            if len(args) >= 2:
+                print(add_birthday(args, book))
+            else:
+                print("Usage: add-birthday <name> <birthday (DD.MM.YYYY)>")
+        elif command == "show-birthday":
+            if len(args) >= 1:
+                print(show_birthday(args, book))
+            else:
+                print("Usage: show-birthday <name>")
+        elif command == "birthdays":
+            print(birthdays(args, book))        
         else:
             print("Invalid command. Please try again.")
 

@@ -1,4 +1,5 @@
 from collections import UserDict
+from datetime import datetime, timedelta
 
 class Field:
     def __init__(self, value):
@@ -19,13 +20,21 @@ class Phone(Field):
             raise ValueError("The phone number must contain only digits")
         super().__init__(value)
 
+class Birthday(Field):
+    def __init__(self, value):
+        try:
+            self.value = datetime.strptime(value, "%d.%m.%Y")
+        except ValueError:
+            raise ValueError("Invalid date format. Use DD.MM.YYYY")
+        
 class Record:
     def __init__(self, name):
         self.name = Name(name)
         self.phones = []
+        self.birthday = None
 
     def add_phone(self, phone):
-        self.phones.append(Phones(phone))
+        self.phones.append(Phone(phone))
     
     def find_phone(self, phone):
         for p in self.phones:
@@ -46,28 +55,47 @@ class Record:
                 del self.phones[idx]
                 return f"Phone {phone} removed."
             return f"Phone {phone} not found."    
-                         
+    
+    def add_birthday(self, birthday):
+        self.birthday = Birthday(birthday)
+        return f"Birthday {birthday} added to contact {self.name.value}."
+
+    def days_to_birthday(self):
+        if self.birthday:
+            today = datetime.now().date()
+            next_birthday = self.birthday.value.replace(year=today.year).date()
+            if next_birthday < today:
+                next_birthday = next_birthday.replace(year=today.year + 1)
+            return (next_birthday - today).days
+        return None                    
 
     def __str__(self):
-        return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
+        phones = '; '.join(p.value for p in self.phones)
+        birthday = f", birthday: {self.birthday}" if self.birthday else ""
+        return f"Contact name: {self.name.value}, phones: {phones}{birthday}"
 
 class AddressBook(UserDict):
     
-    def add_records(self, record):
+    def add_record(self, record):
         self.data[record.name.value] = record
         return f"Record for {record.name.value} added."
     
     def find_record(self, name):
         return self.data.get(name, f"No record found for {name}.")
     
-    def remove_record(self, name):
-        if name in self.data:
-            del self.data[name]
-            return f"Record for {name} removed."
-        return f"Record for {name} not found."
+    def get_upcoming_birthdays(self, days=7):
+        today = datetime.now().date()
+        upcoming = []
+        for record in self.data.values():
+            if record.birthday:
+                next_birthday = record.birthday.value.replace(year=today.year).date()
+                if next_birthday < today:
+                    next_birthday = next_birthday.replace(year=today.year + 1)
+                if 0 <= (next_birthday - today).days <= days:
+                    upcoming.append(record)
+        return upcoming
     
     def __str__(self):
-        return "\n".join(
-            f"Contact name: {record.name.value}, phones: {'; '.join(phone.value for phone in record.phones)}"
-            for record in self.data.values()
-        )
+        return "\n".join(str(record) for record in self.data.values())
+
+    
