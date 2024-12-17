@@ -2,6 +2,7 @@ from helpers import *
 from func_command import *
 from contacts_class import *
 
+
 def main():
     book = AddressBook()
     print("Welcome to the assistant bot!")
@@ -49,6 +50,7 @@ def main():
             print(birthdays(args, book))        
         else:
             print("Invalid command. Please try again.")
+
 
 if __name__ == "__main__":
     main()

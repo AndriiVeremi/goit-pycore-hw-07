@@ -5,7 +5,7 @@ book = AddressBook()
 
 
 user1 = Record("John Doe")
-user1.add_phone("48788083792")
+user1.add_phone("4878808379")
 user1.add_birthday("15.12.1990")
 book.add_record(user1)
 

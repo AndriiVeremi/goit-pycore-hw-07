@@ -1,52 +1,63 @@
 from decorators import input_error
 
-@input_error
-def add_contact(args, contacts):
-    if len(args) != 2:
-        raise ValueError("Expected 2 arguments: name and phone.")
-    name, phone = args
-    contacts[name] = phone
-    return "Contact added."
 
 @input_error
-def change_contact(args, contacts):
-    if len(args) != 2:
-        raise ValueError("Expected 2 arguments: name and new phone.")
-    name, new_phone = args
-    if name in contacts:
-        contacts[name] = new_phone
-        return f"Contact {name} updated."
+def add_contact(args, book):
+    if len(args) < 2:
+        raise ValueError("Expected at least 2 arguments: name and phone.")
+    name, phone, *_ = args
+    record = book.find_record(name)
+    if not record:
+        record = Record(name)
+        book.add_record(record)
+        message = "Contact added."
     else:
-        raise KeyError(f"{name} not found.")
+        message = "Contact updated."
+    record.add_phone(phone)
+    return message
+
 
 @input_error
-def show_contact(args, contacts):
+def change_contact(args, book):
+    if len(args) != 3:
+        raise ValueError("Expected 3 arguments: name, old phone and new phone.")
+    name, old_phone, new_phone = args
+    record = book.find_record(name)
+    if isinstance(record, str):
+        return record
+    return record.edit_phone(old_phone, new_phone)
+    
+    
+@input_error
+def show_contact(args, book):
     if len(args) != 1:
         raise ValueError("Expected 1 argument: name.")
     name = args[0]
-    if name in contacts:
-        return f"Phone number for {name}: {contacts[name]}"
-    else:
-        raise KeyError(f"{name} not found.")
+    record = book.find_record(name)
+    if isinstance(record, str):
+        return record
+    return str(record)
+
 
 @input_error
-def show_all_contact(contacts):
+def show_all_contact(book):
     if not contacts:
         return "No contacts saved."
     else:
-        result = "\n".join(f"{name}: {phone}" for name, phone in contacts.items())
+        result = "\n".join(f"{name}: {phone}" for name, phone in book.items())
         return result
 
+
 @input_error
-def delete_contact(args, contacts):
+def delete_contact(args, book):
     if len(args) != 2:
         raise ValueError("Expected 2 arguments: name and phone.")
     name, phone = args
-    if name in contacts and contacts[name] == phone:
-        del contacts[name]
-        return "Contact deleted."
-    else:
-        raise KeyError(f"{name} not found.")
+    record = book.find_record(name)
+    if isinstance(record, str):
+        return record
+    return record.remove_phone(phone)
+    
     
 @input_error
 def add_birthday(args, book):
