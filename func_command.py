@@ -7,7 +7,7 @@ def add_contact(args, book):
         raise ValueError("Expected at least 2 arguments: name and phone.")
     name, phone, *_ = args
     record = book.find_record(name)
-    if not record:
+    if record is None:
         record = Record(name)
         book.add_record(record)
         message = "Contact added."
@@ -23,8 +23,8 @@ def change_contact(args, book):
         raise ValueError("Expected 3 arguments: name, old phone and new phone.")
     name, old_phone, new_phone = args
     record = book.find_record(name)
-    if isinstance(record, str):
-        return record
+    if record is None: 
+        return f"No contact found with name {name}."
     return record.edit_phone(old_phone, new_phone)
     
     
@@ -37,15 +37,19 @@ def show_contact(args, book):
     if isinstance(record, str):
         return record
     return str(record)
-
+ 
 
 @input_error
 def show_all_contact(book):
-    if not contacts:
-        return "No contacts saved."
-    else:
-        result = "\n".join(f"{name}: {phone}" for name, phone in book.items())
-        return result
+    if not book:  
+        return "No contacts saved." 
+      
+    result = "\n".join(
+        f"{name}: {', '.join(phone.value for phone in record.phones)}"
+        for name, record in book.items()
+    )
+    
+    return result
 
 
 @input_error

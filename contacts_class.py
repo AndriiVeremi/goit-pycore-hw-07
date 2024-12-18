@@ -81,7 +81,7 @@ class AddressBook(UserDict):
         return f"Record for {record.name.value} added."
     
     def find_record(self, name):
-        return self.data.get(name, f"No record found for {name}.")
+        return self.data.get(name, None)
     
     def get_upcoming_birthdays(self, days=7):
         today = datetime.now().date()
