@@ -47,8 +47,7 @@ def show_all_contact(book):
     result = "\n".join(
         f"{name}: {', '.join(phone.value for phone in record.phones)}"
         for name, record in book.items()
-    )
-    
+    )    
     return result
 
 
